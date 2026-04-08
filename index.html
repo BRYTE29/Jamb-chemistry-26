@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAMB Chemistry — 100 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --card: #161f30;
+    --border: #1e2d45;
+    --accent: #00d4aa;
+    --accent2: #3b82f6;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; height: 300px;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,212,170,0.12), transparent);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HOME SCREEN ── */
+  #home {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem; text-align: center; position: relative; z-index: 1;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3);
+    color: var(--accent); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em;
+    padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 2rem;
+    text-transform: uppercase;
+  }
+  .badge::before { content: '◆'; font-size: 0.6rem; }
+  h1.title {
+    font-family: var(--display); font-size: clamp(2.8rem, 8vw, 5.5rem);
+    font-weight: 800; line-height: 1; letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, #3b82f6 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-family: var(--display); font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-weight: 600; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+  .stats-row {
+    display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 3rem;
+  }
+  .stat-chip {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 0.8rem 1.5rem; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+  }
+  .stat-chip span:first-child {
+    font-family: var(--display); font-size: 1.8rem; font-weight: 800; color: var(--accent);
+  }
+  .stat-chip span:last-child { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .btn-start {
+    background: linear-gradient(135deg, var(--accent), #00a884);
+    color: #0a0f1e; font-family: var(--display); font-size: 1rem; font-weight: 800;
+    padding: 1rem 3rem; border: none; border-radius: 12px; cursor: pointer;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(0,212,170,0.3);
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,212,170,0.5); }
+
+  /* ── QUIZ SCREEN ── */
+  #quiz { display: none; min-height: 100vh; padding: 1.5rem; position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;
+  }
+  .q-counter {
+    font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 0.4rem 0.9rem; border-radius: 8px;
+  }
+  .q-counter strong { color: var(--accent); }
+  .progress-wrap { flex: 1; min-width: 120px; }
+  .progress-bar-bg {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; height: 6px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px; transition: width 0.4s ease;
+  }
+  .timer-chip {
+    font-family: var(--mono); font-size: 0.85rem; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 0.4rem 0.9rem; border-radius: 8px; color: var(--warn);
+    min-width: 60px; text-align: center;
+  }
+  .timer-chip.urgent { color: var(--danger); border-color: rgba(239,68,68,0.4); animation: pulse 0.8s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+  .question-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .question-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+  }
+  .q-topic {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+  .q-text {
+    font-size: 1.05rem; line-height: 1.6; color: var(--text); font-weight: 400;
+  }
+
+  .options-grid { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .option-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 0.9rem 1.2rem; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    text-align: left; color: var(--text); font-family: var(--sans); font-size: 0.95rem; line-height: 1.5;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent2); background: rgba(59,130,246,0.08); transform: translateX(3px); }
+  .option-btn.selected { border-color: var(--accent2); background: rgba(59,130,246,0.12); }
+  .option-btn.correct { border-color: var(--success); background: rgba(16,185,129,0.12); }
+  .option-btn.wrong { border-color: var(--danger); background: rgba(239,68,68,0.1); }
+  .option-btn:disabled { cursor: default; transform: none; }
+  .opt-label {
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 500;
+    background: var(--border); color: var(--muted);
+    min-width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.2s, color 0.2s;
+  }
+  .correct .opt-label { background: var(--success); color: #fff; }
+  .wrong .opt-label { background: var(--danger); color: #fff; }
+  .selected .opt-label { background: var(--accent2); color: #fff; }
+
+  .explanation {
+    background: rgba(0,212,170,0.06); border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.5rem;
+    font-size: 0.9rem; line-height: 1.6; color: var(--text);
+    display: none;
+  }
+  .explanation strong { color: var(--accent); }
+
+  .quiz-nav {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .btn-nav {
+    font-family: var(--display); font-size: 0.85rem; font-weight: 700;
+    padding: 0.75rem 1.8rem; border-radius: 10px; border: none; cursor: pointer;
+    letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .btn-prev { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .btn-prev:hover { color: var(--text); border-color: var(--accent2); }
+  .btn-next { background: var(--accent); color: #0a0f1e; }
+  .btn-next:hover { box-shadow: 0 0 20px rgba(0,212,170,0.4); }
+  .btn-submit { background: var(--warn); color: #0a0f1e; }
+  .btn-submit:hover { box-shadow: 0 0 20px rgba(245,158,11,0.4); }
+
+  /* ── RESULTS SCREEN ── */
+  #results { display: none; min-height: 100vh; padding: 2rem; position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+  .score-hero { text-align: center; margin-bottom: 3rem; }
+  .score-circle {
+    width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 1.5rem;
+    border: 4px solid var(--accent);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(circle, rgba(0,212,170,0.1), transparent);
+    box-shadow: 0 0 60px rgba(0,212,170,0.2);
+  }
+  .score-pct { font-family: var(--display); font-size: 2.8rem; font-weight: 800; color: var(--accent); }
+  .score-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; }
+  .score-grade {
+    font-family: var(--display); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;
+  }
+  .score-msg { color: var(--muted); font-size: 0.95rem; }
+  .result-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
+    gap: 1rem; margin-bottom: 2.5rem;
+  }
+  .rs { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; }
+  .rs .n { font-family: var(--display); font-size: 2rem; font-weight: 800; }
+  .rs .l { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.2rem; }
+  .rs.c .n { color: var(--success); }
+  .rs.w .n { color: var(--danger); }
+  .rs.s .n { color: var(--warn); }
+
+  .review-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem; }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.9rem 1.1rem; display: flex; gap: 0.8rem; align-items: flex-start;
+    font-size: 0.88rem;
+  }
+  .review-item.ok { border-left: 3px solid var(--success); }
+  .review-item.bad { border-left: 3px solid var(--danger); }
+  .review-item.skip { border-left: 3px solid var(--muted); }
+  .ri-num { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); min-width: 28px; }
+  .ri-text { flex: 1; line-height: 1.4; }
+  .ri-tag {
+    font-family: var(--mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;
+    border-radius: 4px; flex-shrink: 0;
+  }
+  .ok .ri-tag { background: rgba(16,185,129,0.15); color: var(--success); }
+  .bad .ri-tag { background: rgba(239,68,68,0.12); color: var(--danger); }
+  .skip .ri-tag { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  .btn-retry {
+    display: block; width: 100%; max-width: 300px; margin: 0 auto;
+    background: linear-gradient(135deg, var(--accent), #00a884);
+    color: #0a0f1e; font-family: var(--display); font-size: 1rem; font-weight: 800;
+    padding: 1rem; border: none; border-radius: 12px; cursor: pointer;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    box-shadow: 0 0 30px rgba(0,212,170,0.3); transition: all 0.2s;
+  }
+  .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,212,170,0.5); }
+
+  .section-title {
+    font-family: var(--display); font-size: 1rem; font-weight: 700;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 500px) {
+    .question-card { padding: 1.2rem; }
+    .btn-nav { padding: 0.65rem 1.2rem; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="badge">JAMB Preparation Series</div>
+  <h1 class="title">CHEMISTRY</h1>
+  <p class="subtitle">100 Past Questions &amp; Practice</p>
+  <div class="stats-row">
+    <div class="stat-chip"><span>100</span><span>Questions</span></div>
+    <div class="stat-chip"><span>40</span><span>Min Timer</span></div>
+    <div class="stat-chip"><span>10</span><span>Topics</span></div>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">Start Exam →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <div class="q-counter">Q <strong id="qNum">1</strong> / 100</div>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:1%"></div></div>
+    </div>
+    <div class="timer-chip" id="timer">40:00</div>
+  </div>
+  <div class="question-card">
+    <div class="q-topic" id="qTopic"></div>
+    <p class="q-text" id="qText"></p>
+  </div>
+  <div class="options-grid" id="optionsGrid"></div>
+  <div class="explanation" id="explanation"></div>
+  <div class="quiz-nav">
+    <button class="btn-nav btn-prev" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <button class="btn-nav btn-next" id="btnNext" onclick="navigate(1)">Next →</button>
+    <button class="btn-nav btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">Submit Exam</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="score-hero">
+    <div class="score-circle">
+      <div class="score-pct" id="resPct">0%</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="score-grade" id="resGrade"></div>
+    <div class="score-msg" id="resMsg"></div>
+  </div>
+  <div class="result-stats">
+    <div class="rs c"><div class="n" id="resCorrect">0</div><div class="l">Correct</div></div>
+    <div class="rs w"><div class="n" id="resWrong">0</div><div class="l">Wrong</div></div>
+    <div class="rs s"><div class="n" id="resSkipped">0</div><div class="l">Skipped</div></div>
+  </div>
+  <div class="section-title">Review All Questions</div>
+  <div class="review-list" id="reviewList"></div>
+  <button class="btn-retry" onclick="retryQuiz()">Retry Exam</button>
+</div>
+
+<script>
+const QUESTIONS = [
+  // ── ATOMIC STRUCTURE & PERIODICITY ──
+  {t:"Atomic Structure",q:"The atomic number of an element is defined as the number of",o:["Neutrons in its nucleus","Protons in its nucleus","Electrons in its outer shell","Nucleons in its nucleus"],a:1,e:"Atomic number = number of protons. This determines the element's identity."},
+  {t:"Atomic Structure",q:"An isotope of carbon, ¹⁴C, contains how many neutrons?",o:["6","8","14","12"],a:1,e:"Mass number (14) − Atomic number (6) = 8 neutrons."},
+  {t:"Atomic Structure",q:"Which of the following has the same number of electrons as the Na⁺ ion?",o:["Mg","Al³⁺","Ne","Cl⁻"],a:2,e:"Na⁺ has 10 electrons. Ne also has 10 electrons. They are isoelectronic."},
+  {t:"Atomic Structure",q:"The quantum number that describes the shape of an orbital is the",o:["Principal quantum number","Magnetic quantum number","Azimuthal quantum number","Spin quantum number"],a:2,e:"The azimuthal (angular momentum) quantum number l determines the shape of the orbital (s, p, d, f)."},
+  {t:"Atomic Structure",q:"How many electrons can the third shell (n = 3) hold?",o:["8","18","32","2"],a:1,e:"Maximum electrons in shell n = 2n². For n=3: 2×9 = 18."},
+  {t:"Atomic Structure",q:"The Pauli Exclusion Principle states that",o:["Electrons fill lower energy orbitals first","No two electrons can have the same set of four quantum numbers","Electrons occupy orbitals singly before pairing","Electrons repel each other"],a:1,e:"Pauli Exclusion Principle: no two electrons in an atom can have the same four quantum numbers."},
+  {t:"Periodic Table",q:"Which group contains the noble gases?",o:["Group I","Group VII","Group VIII (0)","Group IV"],a:2,e:"Noble gases are in Group 0 (or Group 18 in IUPAC notation): He, Ne, Ar, Kr, Xe, Rn."},
+  {t:"Periodic Table",q:"Across a period from left to right, atomic radius generally",o:["Increases","Decreases","Stays the same","First increases then decreases"],a:1,e:"Across a period, nuclear charge increases while electrons are added to the same shell, pulling electrons closer — so atomic radius decreases."},
+  {t:"Periodic Table",q:"Which of the following elements has the highest electronegativity?",o:["Oxygen","Chlorine","Fluorine","Nitrogen"],a:2,e:"Fluorine (F) has the highest electronegativity of all elements (3.98 on the Pauling scale)."},
+  {t:"Periodic Table",q:"Elements in the same group of the periodic table have similar chemical properties because they have the same",o:["Number of neutrons","Mass number","Number of valence electrons","Atomic mass"],a:2,e:"Elements in the same group have the same number of valence electrons, which determines their chemical behaviour."},
+  // ── CHEMICAL BONDING ──
+  {t:"Chemical Bonding",q:"An ionic bond is formed by the",o:["Sharing of electrons between atoms","Transfer of electrons from one atom to another","Attraction between two positively charged ions","Sharing of protons between atoms"],a:1,e:"Ionic bonds form when one atom transfers electrons to another, creating oppositely charged ions that attract."},
+  {t:"Chemical Bonding",q:"Which of the following molecules has a linear shape?",o:["H₂O","NH₃","CO₂","CH₄"],a:2,e:"CO₂ has two double bonds and no lone pairs on carbon, giving it a linear geometry (180°)."},
+  {t:"Chemical Bonding",q:"The bond angle in a water molecule is approximately",o:["180°","120°","109.5°","104.5°"],a:3,e:"Water has two bonding pairs and two lone pairs. The lone pairs repel more, compressing the H–O–H angle to ~104.5°."},
+  {t:"Chemical Bonding",q:"A dative (coordinate) bond is one in which",o:["Two atoms share one electron each","Both electrons in the bond come from the same atom","Electrons are transferred completely","Metallic electrons are shared"],a:1,e:"A coordinate/dative bond is formed when one atom provides both electrons of the shared pair."},
+  {t:"Chemical Bonding",q:"Which of the following is NOT a property of ionic compounds?",o:["High melting point","Conduction of electricity when molten","Good conductors of electricity in solid state","Solubility in polar solvents"],a:2,e:"Ionic compounds do NOT conduct electricity in the solid state because ions are held in a fixed lattice and cannot move freely."},
+  {t:"Chemical Bonding",q:"The type of hybridisation in ethene (C₂H₄) is",o:["sp³","sp","sp²","dsp²"],a:2,e:"Each carbon in ethene is sp² hybridised, forming three sigma bonds and one pi bond via unhybridised p-orbitals."},
+  {t:"Chemical Bonding",q:"Which of the following has the strongest intermolecular forces?",o:["H₂","Cl₂","HF","CH₄"],a:2,e:"HF has strong hydrogen bonding (F being very electronegative), giving it the strongest intermolecular forces in this list."},
+  // ── STOICHIOMETRY & MOLE CONCEPT ──
+  {t:"Mole Concept",q:"Avogadro's number is approximately",o:["6.02 × 10²³","3.01 × 10²³","6.02 × 10²²","6.02 × 10²⁴"],a:0,e:"Avogadro's constant = 6.02 × 10²³ mol⁻¹."},
+  {t:"Mole Concept",q:"What is the molar mass of H₂SO₄? (H=1, S=32, O=16)",o:["96 g/mol","98 g/mol","80 g/mol","100 g/mol"],a:1,e:"H₂SO₄: 2(1) + 32 + 4(16) = 2 + 32 + 64 = 98 g/mol."},
+  {t:"Mole Concept",q:"How many moles are in 44 g of CO₂? (C=12, O=16)",o:["0.5 mol","1 mol","2 mol","22 mol"],a:1,e:"Molar mass of CO₂ = 12 + 32 = 44 g/mol. Moles = 44/44 = 1 mol."},
+  {t:"Mole Concept",q:"The empirical formula of a compound is CH₂. Its molecular formula could be",o:["CH₂","C₂H₄","C₃H₆","Both B and C"],a:3,e:"Molecular formula is a multiple of the empirical formula. C₂H₄ and C₃H₆ are both multiples of CH₂."},
+  {t:"Mole Concept",q:"What volume does 2 moles of an ideal gas occupy at STP?",o:["22.4 L","44.8 L","11.2 L","33.6 L"],a:1,e:"One mole of ideal gas at STP = 22.4 L, so 2 moles = 44.8 L."},
+  {t:"Mole Concept",q:"The percentage by mass of nitrogen in NH₃ is (N=14, H=1)",o:["17.6%","82.4%","75%","25%"],a:1,e:"Molar mass NH₃ = 17. % N = (14/17) × 100 ≈ 82.4%."},
+  {t:"Mole Concept",q:"In the reaction 2H₂ + O₂ → 2H₂O, how many moles of water are produced from 4 moles of H₂?",o:["2","4","6","8"],a:1,e:"Mole ratio H₂:H₂O = 2:2 = 1:1. So 4 moles H₂ produces 4 moles H₂O."},
+  // ── GASES ──
+  {t:"Gases",q:"According to Boyle's Law, at constant temperature, the pressure of a gas is",o:["Directly proportional to its volume","Inversely proportional to its volume","Independent of its volume","Equal to its volume"],a:1,e:"Boyle's Law: P ∝ 1/V at constant temperature (PV = constant)."},
+  {t:"Gases",q:"Charles's Law states that at constant pressure, the volume of a gas is",o:["Inversely proportional to temperature","Directly proportional to temperature","Constant regardless of temperature","Inversely proportional to pressure"],a:1,e:"Charles's Law: V ∝ T (in Kelvin) at constant pressure."},
+  {t:"Gases",q:"The ideal gas equation is",o:["PV = nT","PV = nRT","P = nRT","PV = RT"],a:1,e:"The ideal gas equation is PV = nRT, where R is the molar gas constant (8.314 J mol⁻¹ K⁻¹)."},
+  {t:"Gases",q:"Graham's Law of diffusion states that the rate of diffusion of a gas is",o:["Directly proportional to its molar mass","Inversely proportional to the square root of its molar mass","Directly proportional to its density","Independent of its molar mass"],a:1,e:"Graham's Law: rate of diffusion ∝ 1/√M, where M is the molar mass."},
+  {t:"Gases",q:"Which gas deviates most from ideal gas behaviour at high pressure?",o:["Helium","Hydrogen","CO₂","Nitrogen"],a:2,e:"CO₂ has stronger intermolecular forces and larger molecule size, causing greater deviation from ideal behaviour."},
+  // ── ACIDS, BASES & SALTS ──
+  {t:"Acids, Bases & Salts",q:"According to the Brønsted-Lowry theory, a base is a substance that",o:["Produces OH⁻ in water","Accepts a proton (H⁺)","Donates a proton","Has a pH below 7"],a:1,e:"Brønsted-Lowry base: a proton (H⁺) acceptor."},
+  {t:"Acids, Bases & Salts",q:"What is the pH of a neutral solution at 25°C?",o:["0","14","7","10"],a:2,e:"At 25°C, a neutral solution has equal [H⁺] and [OH⁻], giving pH = 7."},
+  {t:"Acids, Bases & Salts",q:"Which of the following is a strong acid?",o:["Ethanoic acid","Carbonic acid","Hydrochloric acid","Citric acid"],a:2,e:"Hydrochloric acid (HCl) is a strong acid — it fully dissociates in water."},
+  {t:"Acids, Bases & Salts",q:"The salt formed when NaOH reacts with H₂SO₄ is",o:["NaCl","Na₂SO₄","NaHCO₃","Na₂CO₃"],a:1,e:"NaOH + H₂SO₄ → Na₂SO₄ + H₂O (neutralisation)."},
+  {t:"Acids, Bases & Salts",q:"An indicator that turns red in acid and blue in alkali is",o:["Phenolphthalein","Methyl orange","Litmus","Universal indicator"],a:2,e:"Litmus turns red in acidic and blue in alkaline solutions."},
+  {t:"Acids, Bases & Salts",q:"A buffer solution is one that",o:["Has a pH of exactly 7","Resists changes in pH on addition of small amounts of acid or alkali","Conducts electricity","Contains no ions"],a:1,e:"A buffer solution resists pH change when small amounts of acid or base are added."},
+  {t:"Acids, Bases & Salts",q:"Which of the following salts undergoes hydrolysis to give an acidic solution?",o:["NaCl","Na₂SO₄","NH₄Cl","K₂CO₃"],a:2,e:"NH₄Cl is a salt of a weak base (NH₃) and strong acid (HCl). The NH₄⁺ ion hydrolyses to give an acidic solution."},
+  // ── REDOX REACTIONS & ELECTROCHEMISTRY ──
+  {t:"Redox & Electrochemistry",q:"Oxidation is defined as",o:["Gain of electrons","Loss of electrons","Gain of hydrogen","Decrease in oxidation state"],a:1,e:"Oxidation = Loss of electrons (OIL — Oxidation Is Loss)."},
+  {t:"Redox & Electrochemistry",q:"In the reaction Zn + CuSO₄ → ZnSO₄ + Cu, zinc is",o:["Reduced","Oxidised","Both oxidised and reduced","Neither oxidised nor reduced"],a:1,e:"Zinc loses electrons (Zn → Zn²⁺) — it is oxidised. Copper ions gain electrons — they are reduced."},
+  {t:"Redox & Electrochemistry",q:"What is the oxidation state of chromium in K₂Cr₂O₇?",o:["+3","+6","+7","+4"],a:1,e:"Let Cr = x. 2(+1) + 2x + 7(−2) = 0 → 2 + 2x − 14 = 0 → x = +6."},
+  {t:"Redox & Electrochemistry",q:"During electrolysis of dilute H₂SO₄, what is produced at the cathode?",o:["Oxygen","Hydrogen","Sulphur dioxide","Sulphur"],a:1,e:"At the cathode (negative electrode), H⁺ ions are reduced: 2H⁺ + 2e⁻ → H₂."},
+  {t:"Redox & Electrochemistry",q:"The quantity of electricity that deposits one mole of a monovalent metal ion is",o:["1 Faraday","2 Faradays","0.5 Faraday","3 Faradays"],a:0,e:"1 Faraday (96,500 C) deposits 1 mole of a monovalent (1+) metal ion."},
+  {t:"Redox & Electrochemistry",q:"Which of these is a reducing agent in the reaction: Fe²⁺ + MnO₄⁻ → Fe³⁺ + Mn²⁺?",o:["MnO₄⁻","Fe³⁺","Fe²⁺","Mn²⁺"],a:2,e:"Fe²⁺ loses an electron to become Fe³⁺. It is the reducing agent (electron donor)."},
+  // ── CHEMICAL EQUILIBRIUM ──
+  {t:"Chemical Equilibrium",q:"Le Chatelier's Principle states that when a system at equilibrium is subjected to a stress, it will",o:["Shift to increase the stress","Shift to relieve the stress","Remain unaffected","Reach a new equilibrium with more products"],a:1,e:"Le Chatelier's Principle: the system shifts to counteract (relieve) the imposed stress."},
+  {t:"Chemical Equilibrium",q:"For the reaction N₂ + 3H₂ ⇌ 2NH₃, increasing pressure will",o:["Shift equilibrium to the left","Shift equilibrium to the right","Have no effect","Decrease the rate of reaction"],a:1,e:"Increasing pressure favours the side with fewer moles of gas. Left (4 mol) → Right (2 mol), so equilibrium shifts right."},
+  {t:"Chemical Equilibrium",q:"The equilibrium constant expression for aA + bB ⇌ cC + dD is",o:["Kc = [A]ᵃ[B]ᵇ / [C]ᶜ[D]ᵈ","Kc = [C]ᶜ[D]ᵈ / [A]ᵃ[B]ᵇ","Kc = [C][D] / [A][B]","Kc = [A][B] / [C][D]"],a:1,e:"Kc = [products] / [reactants], each raised to its stoichiometric coefficient."},
+  {t:"Chemical Equilibrium",q:"A reaction is at equilibrium when",o:["All reactants are used up","The rate of forward reaction equals the rate of reverse reaction","No reaction is occurring","Only products are present"],a:1,e:"At equilibrium, the forward and reverse reactions proceed at equal rates — concentrations remain constant."},
+  {t:"Chemical Equilibrium",q:"Which of the following does NOT affect the value of the equilibrium constant Kc?",o:["Temperature","Pressure","Concentration of reactants","All of the above change Kc"],a:1,e:"Kc depends only on temperature. Changes in pressure or concentration shift the position of equilibrium but do not change Kc."},
+  // ── ORGANIC CHEMISTRY ──
+  {t:"Organic Chemistry",q:"The general formula for alkanes is",o:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₋₂","CₙHₙ"],a:1,e:"Alkanes are saturated hydrocarbons with general formula CₙH₂ₙ₊₂."},
+  {t:"Organic Chemistry",q:"Which of the following is an example of an alkene?",o:["Ethane","Propane","Ethene","Methane"],a:2,e:"Ethene (CH₂=CH₂) contains a C=C double bond — it is an alkene."},
+  {t:"Organic Chemistry",q:"The IUPAC name of CH₃CH₂OH is",o:["Methanol","Propanol","Ethanol","Butanol"],a:2,e:"CH₃CH₂OH is a 2-carbon alcohol: ethanol (ethan-1-ol)."},
+  {t:"Organic Chemistry",q:"What type of reaction occurs when ethene reacts with bromine?",o:["Substitution","Elimination","Addition","Condensation"],a:2,e:"Alkenes undergo addition reactions. Ethene + Br₂ → 1,2-dibromoethane."},
+  {t:"Organic Chemistry",q:"Isomers are compounds that have the same",o:["Structural formula","Molecular formula but different structures","Physical properties","Functional group"],a:1,e:"Isomers have the same molecular formula but different structural arrangements."},
+  {t:"Organic Chemistry",q:"Fermentation of glucose produces",o:["Methanol and CO₂","Ethanol and CO₂","Ethanol and H₂O","Propanol and CO₂"],a:1,e:"C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (fermentation by yeast)."},
+  {t:"Organic Chemistry",q:"The functional group –COOH is called a",o:["Hydroxyl group","Carbonyl group","Carboxyl group","Amino group"],a:2,e:"–COOH is the carboxyl group, characteristic of carboxylic acids."},
+  {t:"Organic Chemistry",q:"Saponification is the",o:["Hydrolysis of esters using acid","Hydrolysis of esters using alkali","Esterification of alcohols","Oxidation of alcohols"],a:1,e:"Saponification is alkaline hydrolysis of an ester to give a carboxylate salt (soap) and an alcohol."},
+  {t:"Organic Chemistry",q:"Which reagent is used to test for the presence of a C=C double bond?",o:["Fehling's solution","Acidified potassium dichromate","Bromine water","Tollens' reagent"],a:2,e:"Bromine water is decolorised (turns from orange-brown to colourless) in the presence of a C=C double bond."},
+  {t:"Organic Chemistry",q:"The reaction of ethanol with ethanoic acid to form an ester is called",o:["Saponification","Hydrolysis","Esterification","Fermentation"],a:2,e:"Esterification: CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O."},
+  {t:"Organic Chemistry",q:"Markovnikov's rule applies to which type of reaction?",o:["Substitution of alkanes","Addition to alkenes","Elimination from alcohols","Polymerisation"],a:1,e:"Markovnikov's rule: in addition to an asymmetric alkene, H adds to the C bearing more H atoms."},
+  {t:"Organic Chemistry",q:"The monomer of polyethene is",o:["Ethane","Ethanol","Propene","Ethene"],a:3,e:"Polyethene (polythene) is made by addition polymerisation of ethene (CH₂=CH₂)."},
+  {t:"Organic Chemistry",q:"Benzene's molecular formula is",o:["C₆H₁₀","C₆H₆","C₆H₅","C₆H₁₂"],a:1,e:"Benzene: C₆H₆ — six carbons in a ring with alternating/delocalised pi electrons."},
+  {t:"Organic Chemistry",q:"Which of the following is a primary alcohol?",o:["Propan-2-ol","2-methylpropan-2-ol","Butan-2-ol","Propan-1-ol"],a:3,e:"Propan-1-ol has the OH on a terminal carbon (primary). Propan-2-ol and butan-2-ol are secondary."},
+  {t:"Organic Chemistry",q:"The dehydration of ethanol produces",o:["Ethane","Ethanoic acid","Ethene","Diethyl ether (at high temp)"],a:2,e:"Ethanol dehydrated at ~180°C over Al₂O₃ gives ethene (elimination). At ~140°C it gives diethyl ether."},
+  // ── ENERGETICS ──
+  {t:"Energetics",q:"An exothermic reaction is one that",o:["Absorbs heat from the surroundings","Releases heat to the surroundings","Has no energy change","Requires a catalyst"],a:1,e:"Exothermic reactions release energy (heat) to surroundings; ΔH is negative."},
+  {t:"Energetics",q:"Hess's Law states that the enthalpy change of a reaction",o:["Depends on the pathway taken","Is independent of the pathway taken","Is always negative","Equals the activation energy"],a:1,e:"Hess's Law: total enthalpy change is the same regardless of the route taken."},
+  {t:"Energetics",q:"The standard enthalpy of formation is the enthalpy change when",o:["One mole of a compound decomposes","One mole of a compound is formed from its elements in standard states","Elements react with oxygen","One mole of a substance is combusted"],a:1,e:"Standard enthalpy of formation ΔHf°: enthalpy change when 1 mole of compound is formed from its elements in their standard states."},
+  {t:"Energetics",q:"Bond breaking is",o:["Exothermic","Endothermic","Neither exothermic nor endothermic","Dependent on temperature"],a:1,e:"Bond breaking always requires energy input — it is endothermic. Bond formation releases energy (exothermic)."},
+  {t:"Energetics",q:"The activation energy of a reaction is",o:["The energy released during the reaction","The minimum energy required for a reaction to occur","The enthalpy change of the reaction","The energy of the products"],a:1,e:"Activation energy (Ea) is the minimum energy that colliding particles need for a reaction to occur."},
+  // ── KINETICS ──
+  {t:"Kinetics",q:"Increasing temperature increases the rate of reaction because",o:["It increases activation energy","It decreases the concentration of reactants","It increases the frequency of effective collisions","It decreases activation energy"],a:2,e:"Higher temperature → particles have more kinetic energy → more frequent collisions with sufficient energy to overcome activation energy."},
+  {t:"Kinetics",q:"A catalyst increases the rate of reaction by",o:["Increasing the activation energy","Providing an alternative pathway with lower activation energy","Increasing the concentration of reactants","Increasing the temperature"],a:1,e:"A catalyst provides an alternative reaction pathway with a lower activation energy."},
+  {t:"Kinetics",q:"The order of a reaction refers to",o:["The number of steps in the mechanism","The number of moles of reactant","The power to which the concentration of a reactant is raised in the rate equation","The temperature at which the reaction occurs"],a:2,e:"Reaction order is the sum of powers (exponents) of concentration terms in the rate equation."},
+  {t:"Kinetics",q:"For a first-order reaction, the half-life is",o:["Proportional to the initial concentration","Constant and independent of concentration","Inversely proportional to rate constant","Equal to the activation energy"],a:1,e:"For a first-order reaction, half-life t½ = ln2/k, which is constant and independent of concentration."},
+  // ── METALS & INDUSTRY ──
+  {t:"Metals & Industry",q:"The most abundant metal in the Earth's crust is",o:["Iron","Copper","Aluminium","Silicon"],a:2,e:"Aluminium is the most abundant metal in the Earth's crust (~8%)."},
+  {t:"Metals & Industry",q:"Iron is extracted from its ore using the",o:["Electrolytic process","Blast furnace","Bessemer converter","Dow process"],a:1,e:"Iron is extracted in a blast furnace using coke (carbon) as a reducing agent."},
+  {t:"Metals & Industry",q:"The ore of aluminium is",o:["Haematite","Bauxite","Galena","Malachite"],a:1,e:"Aluminium is extracted from bauxite (Al₂O₃·2H₂O) by the Hall-Héroult electrolytic process."},
+  {t:"Metals & Industry",q:"Rusting of iron is an example of",o:["A physical change","Reduction","Electrochemical corrosion","Thermal decomposition"],a:2,e:"Rusting is electrochemical corrosion: iron is oxidised in the presence of water and oxygen."},
+  {t:"Metals & Industry",q:"The Haber process is used for the industrial manufacture of",o:["Sulphuric acid","Ammonia","Hydrogen","Nitric acid"],a:1,e:"The Haber process: N₂ + 3H₂ ⇌ 2NH₃ (conditions: 450°C, 200 atm, Fe catalyst)."},
+  {t:"Metals & Industry",q:"The Contact process is used to manufacture",o:["Ammonia","Nitric acid","Sulphuric acid","Hydrochloric acid"],a:2,e:"The Contact process produces sulphuric acid: SO₂ is oxidised to SO₃ using a V₂O₅ catalyst."},
+  {t:"Metals & Industry",q:"Galvanisation involves coating iron with",o:["Tin","Lead","Zinc","Copper"],a:2,e:"Galvanisation is the coating of iron with zinc to protect it from corrosion."},
+  // ── WATER & ENVIRONMENT ──
+  {t:"Water Chemistry",q:"Temporary hardness in water is caused by",o:["CaSO₄","MgSO₄","Ca(HCO₃)₂","NaCl"],a:2,e:"Temporary hardness is caused by dissolved calcium (or magnesium) hydrogen carbonate, removed by boiling."},
+  {t:"Water Chemistry",q:"Which of the following can soften both temporary and permanent hard water?",o:["Boiling","Adding Na₂CO₃ (washing soda)","Distillation","Adding soap"],a:2,e:"Distillation removes all dissolved salts, softening both temporary and permanent hard water. (Washing soda also works for both.)"},
+  {t:"Water Chemistry",q:"Which gas causes acid rain?",o:["N₂","CO₂","SO₂","O₂"],a:2,e:"SO₂ (sulphur dioxide) dissolves in rainwater to form sulphurous/sulphuric acid — a major cause of acid rain."},
+  // ── NUCLEAR CHEMISTRY ──
+  {t:"Nuclear Chemistry",q:"In alpha decay, the mass number of the nucleus",o:["Increases by 4","Decreases by 4","Stays the same","Decreases by 2"],a:1,e:"Alpha particle (⁴₂He): mass number decreases by 4, atomic number decreases by 2."},
+  {t:"Nuclear Chemistry",q:"Beta particles are",o:["Helium nuclei","High-energy photons","Fast-moving electrons","Positrons only"],a:2,e:"Beta particles (β⁻) are high-energy electrons emitted from the nucleus when a neutron converts to a proton."},
+  {t:"Nuclear Chemistry",q:"Gamma rays are",o:["Fast neutrons","Electromagnetic radiation of very high frequency","Positively charged particles","Alpha particles"],a:1,e:"Gamma rays are high-frequency electromagnetic radiation emitted from the nucleus — they carry no charge or mass."},
+  {t:"Nuclear Chemistry",q:"The half-life of a radioactive element is the time taken for",o:["All atoms to decay","Half the number of atoms to decay","The activity to double","The element to become stable"],a:1,e:"Half-life: the time for half the radioactive nuclei in a sample to decay."},
+  // ── ADDITIONAL MIXED QUESTIONS ──
+  {t:"Atomic Structure",q:"The electron configuration of Na (atomic number 11) is",o:["2,8,1","2,8,3","2,9","1,8,2"],a:0,e:"Na has 11 electrons arranged as 2 in the first shell, 8 in the second, 1 in the third."},
+  {t:"Chemical Bonding",q:"Metallic bonding involves",o:["Transfer of electrons","Sharing of electrons between adjacent atoms","A lattice of positive ions in a sea of delocalised electrons","Hydrogen bonding"],a:2,e:"Metallic bonding: metal ions arranged in a lattice with delocalised (free) electrons mobile throughout."},
+  {t:"Mole Concept",q:"What is the number of molecules in 18 g of water? (H=1, O=16)",o:["6.02 × 10²³","3.01 × 10²³","12.04 × 10²³","1.81 × 10²³"],a:0,e:"Molar mass of H₂O = 18 g/mol. 18 g = 1 mol = 6.02 × 10²³ molecules."},
+  {t:"Acids, Bases & Salts",q:"A solution with pH = 2 is",o:["Weakly acidic","Strongly basic","Strongly acidic","Neutral"],a:2,e:"pH 2 means [H⁺] = 0.01 mol/L — this is a strongly acidic solution."},
+  {t:"Redox & Electrochemistry",q:"Which metal is used as the anode in the electrolytic refining of copper?",o:["Pure copper","Carbon","Impure copper","Platinum"],a:2,e:"In the electrolytic refining of copper, impure copper is the anode (it dissolves), and pure copper is the cathode."},
+  {t:"Organic Chemistry",q:"Nylon is a type of",o:["Addition polymer","Condensation polymer","Natural polymer","Rubber"],a:1,e:"Nylon (polyamide) is made by condensation polymerisation — with loss of water or HCl at each linkage."},
+  {t:"Energetics",q:"Which of the following processes is endothermic?",o:["Combustion of methane","Rusting of iron","Photosynthesis","Neutralisation"],a:2,e:"Photosynthesis absorbs light energy to convert CO₂ and H₂O into glucose — it is endothermic."},
+  {t:"Kinetics",q:"Which of the following does NOT affect the rate of a chemical reaction?",o:["Temperature","Catalyst","Pressure (for gases)","Colour of reactants"],a:3,e:"Colour of reactants does not affect the rate of reaction. Temperature, catalyst, concentration, surface area, and pressure (for gases) all do."},
+  {t:"Metals & Industry",q:"An alloy of copper and zinc is called",o:["Bronze","Brass","Duralumin","Steel"],a:1,e:"Brass is an alloy of copper (Cu) and zinc (Zn). Bronze is copper + tin."},
+  {t:"Gases",q:"At constant volume, if the temperature of a gas is doubled (in Kelvin), the pressure",o:["Halves","Remains the same","Doubles","Quadruples"],a:2,e:"Gay-Lussac's Law: P ∝ T at constant volume. Double the temperature (K) → double the pressure."},
+  {t:"Periodic Table",q:"Which of the following is a transition metal?",o:["Calcium","Potassium","Iron","Aluminium"],a:2,e:"Iron (Fe) is a transition metal (d-block). Ca, K are s-block; Al is p-block."},
+  {t:"Chemical Equilibrium",q:"For the reaction CO(g) + 3H₂(g) ⇌ CH₄(g) + H₂O(g), which will shift equilibrium to the right?",o:["Decreasing pressure","Increasing temperature if exothermic","Removing CH₄","Decreasing H₂ concentration"],a:2,e:"Removing a product (CH₄) decreases product concentration, shifting equilibrium to the right by Le Chatelier's Principle."},
+  {t:"Organic Chemistry",q:"Which of the following is NOT a property of benzene?",o:["It decolorises bromine water readily","It is planar","It undergoes substitution reactions preferentially","It has delocalised pi electrons"],a:0,e:"Benzene does NOT readily decolorise bromine water (no easy addition) because it is aromatic. It prefers substitution."},
+  {t:"Nuclear Chemistry",q:"Carbon-14 dating is used to determine the age of",o:["Rocks and minerals","Living organisms only","Organic materials and remains","Metals"],a:2,e:"¹⁴C dating is used to determine the age of organic (carbon-containing) materials such as wood, bone, and cloth."},
+  {t:"Water Chemistry",q:"The process of adding chlorine to drinking water is primarily to",o:["Improve taste","Kill microorganisms","Remove hardness","Add minerals"],a:1,e:"Chlorination of water kills harmful bacteria and other microorganisms, making water safe to drink."},
+  {t:"Atomic Structure",q:"The number of neutrons in ⁵⁶₂₆Fe is",o:["26","56","30","82"],a:2,e:"Neutrons = Mass number − Atomic number = 56 − 26 = 30."},
+  {t:"Acids, Bases & Salts",q:"Which of the following is an amphoteric oxide?",o:["Na₂O","MgO","Al₂O₃","SO₃"],a:2,e:"Al₂O₃ is amphoteric — it reacts with both acids and bases."},
+  {t:"Redox & Electrochemistry",q:"The electrolyte used in the Hall-Héroult process for extracting aluminium is",o:["Molten Al₂O₃ alone","Molten Al₂O₃ dissolved in molten cryolite","Aqueous AlCl₃","Dilute H₂SO₄"],a:1,e:"Al₂O₃ is dissolved in molten cryolite (Na₃AlF₆) to lower the melting point for the Hall-Héroult process."},
+  {t:"Organic Chemistry",q:"The reaction of an alcohol with a carboxylic acid in the presence of a mineral acid catalyst produces",o:["An aldehyde","An ester","A ketone","A carboxylate salt"],a:1,e:"Alcohol + carboxylic acid → ester + water (esterification)."},
+  {t:"Metals & Industry",q:"Which of the following is the most reactive metal?",o:["Iron","Copper","Sodium","Gold"],a:2,e:"Sodium is the most reactive metal in this list. It is in Group 1 and reacts vigorously with water."},
+  {t:"Energetics",q:"The standard state of an element is its",o:["Gaseous state","Liquid state","Most stable physical form at 298 K and 1 atm pressure","Dissolved form in water"],a:2,e:"Standard state: the most stable physical form of an element at 298 K (25°C) and 1 atm (100 kPa)."},
+];
+
+let current = 0, answers = [], timer, timeLeft = 40 * 60;
+
+function startQuiz() {
+  answers = new Array(QUESTIONS.length).fill(null);
+  current = 0;
+  timeLeft = 40 * 60;
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    const chip = document.getElementById('timer');
+    chip.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (timeLeft <= 60) chip.classList.add('urgent'); else chip.classList.remove('urgent');
+    if (timeLeft <= 0) { clearInterval(timer); submitQuiz(); }
+  }, 1000);
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('qNum').textContent = current + 1;
+  document.getElementById('progressBar').style.width = ((current + 1) / QUESTIONS.length * 100) + '%';
+  document.getElementById('qTopic').textContent = q.t;
+  document.getElementById('qText').textContent = q.q;
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  const answered = answers[current] !== null;
+
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    if (answered) {
+      btn.disabled = true;
+      if (i === q.a) btn.classList.add('correct');
+      else if (i === answers[current]) btn.classList.add('wrong');
+    } else if (answers[current] === i) {
+      btn.classList.add('selected');
+    }
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  const exp = document.getElementById('explanation');
+  if (answered) { exp.innerHTML = `<strong>Explanation:</strong> ${q.e}`; exp.style.display = 'block'; }
+  else exp.style.display = 'none';
+
+  document.getElementById('btnPrev').style.display = current > 0 ? 'inline-block' : 'none';
+  const isLast = current === QUESTIONS.length - 1;
+  document.getElementById('btnNext').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('btnSubmit').style.display = isLast ? 'inline-block' : 'none';
+}
+
+function selectAnswer(i) {
+  if (answers[current] !== null) return;
+  answers[current] = i;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < QUESTIONS.length) { current = next; renderQuestion(); }
+}
+
+function submitQuiz() {
+  clearInterval(timer);
+  let correct = 0, wrong = 0, skipped = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (answers[i] === null) skipped++;
+    else if (answers[i] === q.a) correct++;
+    else wrong++;
+  });
+  const pct = Math.round(correct / QUESTIONS.length * 100);
+
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('resPct').textContent = pct + '%';
+  document.getElementById('resCorrect').textContent = correct;
+  document.getElementById('resWrong').textContent = wrong;
+  document.getElementById('resSkipped').textContent = skipped;
+
+  let grade, msg;
+  if (pct >= 80) { grade = '🏆 Excellent!'; msg = 'Outstanding performance. You are well-prepared for JAMB.'; }
+  else if (pct >= 60) { grade = '✅ Good'; msg = 'Solid score. Review your weak areas and you\'ll ace JAMB.'; }
+  else if (pct >= 40) { grade = '⚠️ Average'; msg = 'Keep practising. Focus on the topics you found difficult.'; }
+  else { grade = '❌ Needs Work'; msg = 'Don\'t give up! Consistent study and practice will improve your score.'; }
+
+  document.getElementById('resGrade').textContent = grade;
+  document.getElementById('resMsg').textContent = msg;
+
+  const list = document.getElementById('reviewList');
+  list.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const div = document.createElement('div');
+    const cls = answers[i] === null ? 'skip' : answers[i] === q.a ? 'ok' : 'bad';
+    const tag = answers[i] === null ? 'Skipped' : answers[i] === q.a ? '✓ Correct' : '✗ Wrong';
+    div.className = `review-item ${cls}`;
+    div.innerHTML = `<span class="ri-num">${i+1}.</span><span class="ri-text">${q.q}</span><span class="ri-tag">${tag}</span>`;
+    list.appendChild(div);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function retryQuiz() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('home').style.display = 'flex';
+}
+</script>
+</body>
+</html>
